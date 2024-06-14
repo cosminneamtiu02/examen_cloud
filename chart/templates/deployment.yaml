@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  minReadySeconds: 20
+  progressDeadlineSeconds: 600
+  replicas: 4
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: webapp
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: webapp
+    spec:
+      containers:
+        - image: kodekloud/webapp-color:v1
+          imagePullPolicy: IfNotPresent
+          name: simple-webapp
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: awesome
+  labels:
+    app: nginx
+    env: exam
+spec:
+  replicas: {{ randNumeric 1}}
+  selector:
+    matchLabels:
+      app: nginx
+      env: exam
+  template:
+    metadata:
+      labels:
+        app: nginx
+        env: exam
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: another-nginx-deployment
+  namespace: awesome
+  labels:
+    app: nginx
+    env: exam
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      env: exam
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: nginx
+        env: exam
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80

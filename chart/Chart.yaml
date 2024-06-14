@@ -1,0 +1,7 @@
+apiVersion: v2
+name: exam
+description: A helm chart containing all the necessary resources for the exam
+
+type: application
+
+version: 1.0.0
